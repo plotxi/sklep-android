@@ -8,30 +8,46 @@
     android:padding="16dp"
     tools:context=".activities.MainActivity">
 
-    <!-- Przycisk wyloguj na samej górze -->
+    <!-- Tytuł sklepu - ograniczony szerokością, żeby nie kolidował z ikonami -->
+    <TextView
+        android:id="@+id/tvStoreTitle"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:text="Nasze Produkty"
+        android:textSize="22sp"
+        android:textStyle="bold"
+        android:layout_marginEnd="8dp"
+        app:layout_constraintBottom_toBottomOf="@+id/btnLogout"
+        app:layout_constraintEnd_toStartOf="@+id/btnGoToCart"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/btnLogout" />
+
+    <!-- Przycisk Koszyk jako Ikona -->
+    <ImageButton
+        android:id="@+id/btnGoToCart"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:layout_marginEnd="8dp"
+        android:background="?attr/selectableItemBackgroundBorderless"
+        android:contentDescription="Koszyk"
+        android:src="@drawable/baseline_shopping_basket_24"
+        app:tint="#6750A4"
+        app:layout_constraintBottom_toBottomOf="@+id/btnLogout"
+        app:layout_constraintEnd_toStartOf="@+id/btnLogout"
+        app:layout_constraintTop_toTopOf="@+id/btnLogout" />
+
+    <!-- Przycisk wyloguj -->
     <Button
         android:id="@+id/btnLogout"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Wyloguj się"
+        android:text="Wyloguj"
         android:backgroundTint="#6750A4"
         android:textColor="@android:color/white"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <!-- Tytuł sklepu -->
-    <TextView
-        android:id="@+id/tvStoreTitle"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Nasze Produkty"
-        android:textSize="24sp"
-        android:textStyle="bold"
-        app:layout_constraintBottom_toBottomOf="@+id/btnLogout"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/btnLogout" />
-
-    <!-- Kategorie - Teraz mają poprawne ID i marginesy -->
+    <!-- Kategorie -->
     <HorizontalScrollView
         android:id="@+id/categoryScrollView"
         android:layout_width="0dp"
@@ -57,7 +73,7 @@
         </LinearLayout>
     </HorizontalScrollView>
 
-    <!-- Lista produktów - POPRAWIONA: teraz startuje POD kategoriami -->
+    <!-- Lista produktów -->
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/rvProducts"
         android:layout_width="0dp"

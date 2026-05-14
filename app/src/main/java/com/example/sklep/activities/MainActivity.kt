@@ -4,6 +4,7 @@ import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.widget.Button
+import android.widget.ImageButton
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
@@ -21,15 +22,38 @@ class MainActivity : AppCompatActivity() {
     private lateinit var adapter: ProductAdapter
     private var allProducts: List<Product> = emptyList()
 
+    // Współdzielona lista produktów w koszyku dostępna w całej aplikacji
+    companion object {
+        val cartItems = mutableListOf<Product>()
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
+        // 1. Konfiguracja listy produktów (RecyclerView)
         val recyclerView = findViewById<RecyclerView>(R.id.rvProducts)
         recyclerView.layoutManager = GridLayoutManager(this, 2)
-        adapter = ProductAdapter(emptyList())
+
+        // Inicjalizacja adaptera z funkcją dodawania do koszyka
+        adapter = ProductAdapter(emptyList()) { wybranyProdukt ->
+            dodajDoKoszyka(wybranyProdukt)
+        }
         recyclerView.adapter = adapter
 
+        // 2. Obsługa przycisku Koszyka (ImageButton)
+        val btnGoToCart = findViewById<ImageButton>(R.id.btnGoToCart)
+        btnGoToCart.setOnClickListener {
+            if (cartItems.isEmpty()) {
+                Toast.makeText(this, "Twój koszyk jest pusty!", Toast.LENGTH_SHORT).show()
+            } else {
+                // Otwieramy nową aktywność koszyka
+                val intent = Intent(this, CartActivity::class.java)
+                startActivity(intent)
+            }
+        }
+
+        // 3. Obsługa przycisku Wyloguj
         val btnLogout = findViewById<Button>(R.id.btnLogout)
         btnLogout.setOnClickListener {
             TokenManager.clearToken(this)
@@ -39,8 +63,14 @@ class MainActivity : AppCompatActivity() {
             finish()
         }
 
-        // --- OBSŁUGA KATEGORII ---
+        // 4. Konfiguracja przycisków kategorii
+        setupCategoryButtons()
 
+        // 5. Pobranie produktów z bazy danych
+        fetchProducts()
+    }
+
+    private fun setupCategoryButtons() {
         findViewById<Button>(R.id.btnAll).setOnClickListener {
             adapter.updateData(allProducts)
         }
@@ -60,17 +90,18 @@ class MainActivity : AppCompatActivity() {
         findViewById<Button>(R.id.btnHome).setOnClickListener {
             filterAndCheck(4, "Dom")
         }
-
-        fetchProducts()
     }
 
-    // Pomocnicza funkcja do filtrowania i sprawdzania co jest w liście
+    private fun dodajDoKoszyka(product: Product) {
+        cartItems.add(product)
+        Toast.makeText(this, "Dodano do koszyka: ${product.name}", Toast.LENGTH_SHORT).show()
+        Log.d("KOSZYK_DEBUG", "Produkty w koszyku: ${cartItems.size}")
+    }
+
     private fun filterAndCheck(id: Int, name: String) {
         val filtered = allProducts.filter { it.category_id == id }
         if (filtered.isEmpty()) {
-            Toast.makeText(this, "Brak produktów w kategorii $name (ID: $id)", Toast.LENGTH_SHORT).show()
-            // Logujemy ID wszystkich produktów, żebyś wiedział co przychodzi z bazy
-            allProducts.forEach { Log.d("DEBUG_KAT", "Produkt: ${it.name}, posiada category_id: ${it.category_id}") }
+            Toast.makeText(this, "Brak produktów w kategorii $name", Toast.LENGTH_SHORT).show()
         }
         adapter.updateData(filtered)
     }
@@ -85,12 +116,13 @@ class MainActivity : AppCompatActivity() {
                     val products = response.body() ?: emptyList()
                     allProducts = products
                     adapter.updateData(products)
-                    Log.d("PRODUKTY_DEBUG", "Pobrano produktów: ${products.size}")
+                    Log.d("PRODUKTY_DEBUG", "Pobrano: ${products.size} produktów")
                 } else {
-                    Log.e("PRODUKTY_DEBUG", "Błąd serwera: ${response.code()}")
+                    Log.e("PRODUKTY_DEBUG", "Błąd API: ${response.code()}")
                 }
             } catch (e: Exception) {
-                Log.e("PRODUKTY_DEBUG", "Błąd sieci: ${e.message}")
+                Log.e("PRODUKTY_DEBUG", "Wyjątek sieci: ${e.message}")
+                Toast.makeText(this@MainActivity, "Błąd połączenia z serwerem", Toast.LENGTH_SHORT).show()
             }
         }
     }

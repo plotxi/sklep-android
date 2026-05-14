@@ -38,5 +38,15 @@
             android:textSize="16sp"
             android:text="0.00 zł" />
 
+        <!-- Dodaj ten Button pod ceną produktu w swoim pliku item_product.xml -->
+        <Button
+            android:id="@+id/btnAddToCart"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Dodaj do koszyka"
+            android:textSize="12sp"
+            android:backgroundTint="#6750A4"
+            android:layout_marginTop="4dp" />
+
     </LinearLayout>
 </com.google.android.material.card.MaterialCardView>
