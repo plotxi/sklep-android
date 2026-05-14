@@ -31,18 +31,44 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="@+id/btnLogout" />
 
-    <!-- Lista produktów (siatka 2-kolumnowa) -->
+    <!-- Kategorie - Teraz mają poprawne ID i marginesy -->
+    <HorizontalScrollView
+        android:id="@+id/categoryScrollView"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="12dp"
+        android:scrollbars="none"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/btnLogout">
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:padding="4dp">
+
+            <Button android:id="@+id/btnAll" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Wszystkie" android:layout_marginEnd="4dp" style="@style/Widget.MaterialComponents.Button.TextButton"/>
+            <Button android:id="@+id/btnSport" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Sport" android:layout_marginEnd="4dp" style="@style/Widget.MaterialComponents.Button.TextButton"/>
+            <Button android:id="@+id/btnElektronika" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Elektronika" android:layout_marginEnd="4dp" style="@style/Widget.MaterialComponents.Button.TextButton"/>
+            <Button android:id="@+id/btnBooks" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Książki" android:layout_marginEnd="4dp" style="@style/Widget.MaterialComponents.Button.TextButton"/>
+            <Button android:id="@+id/btnHome" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Dom" style="@style/Widget.MaterialComponents.Button.TextButton"/>
+
+        </LinearLayout>
+    </HorizontalScrollView>
+
+    <!-- Lista produktów - POPRAWIONA: teraz startuje POD kategoriami -->
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/rvProducts"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        android:layout_marginTop="16dp"
+        android:layout_marginTop="8dp"
         app:layoutManager="androidx.recyclerview.widget.GridLayoutManager"
         app:spanCount="2"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/btnLogout"
+        app:layout_constraintTop_toBottomOf="@+id/categoryScrollView"
         tools:listitem="@layout/item_product" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

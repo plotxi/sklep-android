@@ -19,16 +19,21 @@ class LoginActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        // 1. AUTO-LOGOWANIE: Sprawdź czy user ma już token
-        val savedToken = TokenManager.getToken(this)
-        if (!savedToken.isNullOrEmpty()) {
-            startActivity(Intent(this, MainActivity::class.java))
-            finish()
-            return // Kończymy tutaj, nie ładujemy reszty widoków
-        }
-
+        // 1. NAJPIERW ustawiamy widok, aby uniknąć crashu przy starcie
         setContentView(R.layout.activity_login)
 
+        // 2. AUTO-LOGOWANIE: Sprawdzamy token
+        val savedToken = TokenManager.getToken(this)
+        if (!savedToken.isNullOrEmpty()) {
+            val intent = Intent(this, MainActivity::class.java)
+            // Flagi czyszczą stos, żeby przycisk "wstecz" nie wracał do logowania
+            intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+            startActivity(intent)
+            finish()
+            return // Bardzo ważne: kończymy onCreate, jeśli użytkownik jest już zalogowany
+        }
+
+        // 3. Inicjalizacja widoków (tylko jeśli nie było autologowania)
         val etLogin = findViewById<TextInputEditText>(R.id.etLogin)
         val etPassword = findViewById<TextInputEditText>(R.id.etPassword)
         val btnLogin = findViewById<Button>(R.id.btnLogin)
@@ -39,7 +44,7 @@ class LoginActivity : AppCompatActivity() {
             startActivity(Intent(this, RegisterActivity::class.java))
         }
 
-        // Logika logowania
+        // Obsługa logowania
         btnLogin.setOnClickListener {
             val login = etLogin.text.toString().trim()
             val pass = etPassword.text.toString().trim()
@@ -59,9 +64,13 @@ class LoginActivity : AppCompatActivity() {
                         if (body?.success == true) {
                             val tokenValue = body.data?.token
                             if (!tokenValue.isNullOrEmpty()) {
+                                // Zapisujemy token i idziemy do sklepu
                                 TokenManager.saveToken(this@LoginActivity, tokenValue)
                                 Toast.makeText(this@LoginActivity, "Zalogowano!", Toast.LENGTH_SHORT).show()
-                                startActivity(Intent(this@LoginActivity, MainActivity::class.java))
+
+                                val intent = Intent(this@LoginActivity, MainActivity::class.java)
+                                intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+                                startActivity(intent)
                                 finish()
                             }
                         } else {
@@ -69,9 +78,8 @@ class LoginActivity : AppCompatActivity() {
                             Toast.makeText(this@LoginActivity, msg, Toast.LENGTH_SHORT).show()
                         }
                     } else {
-                        // Obsługa błędów statusu HTTP (np. 401 przy złym haśle)
                         val msg = if (response.code() == 401) "Nieprawidłowy login lub hasło"
-                        else "Błąd: ${response.code()}"
+                        else "Błąd serwera: ${response.code()}"
                         Toast.makeText(this@LoginActivity, msg, Toast.LENGTH_SHORT).show()
                     }
                 } catch (e: Exception) {
