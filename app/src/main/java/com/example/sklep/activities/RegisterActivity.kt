@@ -1,9 +1,10 @@
 package com.example.sklep.activities
 
 import android.os.Bundle
-import android.util.Log
 import android.util.Patterns
+import android.view.View
 import android.widget.Button
+import android.widget.ProgressBar
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
@@ -11,8 +12,10 @@ import androidx.lifecycle.lifecycleScope
 import com.example.sklep.R
 import com.example.sklep.api.RegisterRequest
 import com.example.sklep.api.RetrofitClient
+import com.example.sklep.utils.NetworkUtils
 import com.google.android.material.textfield.TextInputEditText
 import kotlinx.coroutines.launch
+import org.json.JSONObject
 
 class RegisterActivity : AppCompatActivity() {
 
@@ -25,19 +28,19 @@ class RegisterActivity : AppCompatActivity() {
         val etRegPassword = findViewById<TextInputEditText>(R.id.etRegPassword)
         val etRegPasswordRepeat = findViewById<TextInputEditText>(R.id.etRegPasswordRepeat)
         val btnRegister = findViewById<Button>(R.id.btnRegister)
+        val progressRegister = findViewById<ProgressBar>(R.id.progressRegister)
         val tvBackToLogin = findViewById<TextView>(R.id.tvBackToLogin)
 
-        btnRegister.setOnClickListener {
-            // TEST: To musi się pojawić w Logcat (zakładka Debug)
-            Log.d("SKLEP_DEBUG", "Kliknięto przycisk rejestracji!")
+        tvBackToLogin.setOnClickListener { finish() }
 
+        btnRegister.setOnClickListener {
             val email = etRegEmail.text.toString().trim()
             val login = etRegLogin.text.toString().trim()
             val pass = etRegPassword.text.toString().trim()
             val passRepeat = etRegPasswordRepeat.text.toString().trim()
 
             if (email.isEmpty() || login.isEmpty() || pass.isEmpty() || passRepeat.isEmpty()) {
-                Toast.makeText(this, "Wypełnij wszystkie pola!", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this, "Wypełnij wszystkie pola.", Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
             }
 
@@ -56,51 +59,57 @@ class RegisterActivity : AppCompatActivity() {
                 return@setOnClickListener
             }
 
+            if (!NetworkUtils.hasInternet(this)) {
+                Toast.makeText(this, "Brak połączenia z internetem.", Toast.LENGTH_LONG).show()
+                return@setOnClickListener
+            }
+
+            btnRegister.isEnabled = false
+            progressRegister.visibility = View.VISIBLE
+
             lifecycleScope.launch {
                 try {
-                    val service = RetrofitClient.getService(this@RegisterActivity)
-                    val response = service.register(RegisterRequest(login, email, pass))
+                    val response = RetrofitClient.getService(this@RegisterActivity)
+                        .register(RegisterRequest(login, email, pass))
 
                     if (response.isSuccessful) {
                         val body = response.body()
                         if (body?.success == true) {
-                            Toast.makeText(
-                                this@RegisterActivity,
-                                "Konto utworzone!",
-                                Toast.LENGTH_SHORT
-                            ).show()
+                            Toast.makeText(this@RegisterActivity, "Konto utworzone.", Toast.LENGTH_SHORT).show()
                             finish()
                         } else {
-                            // Serwer zwrócił 200 OK, ale success: false
-                            val msg = body?.message ?: "Ten użytkownik lub email już istnieje"
-                            Toast.makeText(this@RegisterActivity, msg, Toast.LENGTH_SHORT).show()
+                            Toast.makeText(
+                                this@RegisterActivity,
+                                body?.message ?: "Nie udało się utworzyć konta.",
+                                Toast.LENGTH_SHORT
+                            ).show()
                         }
                     } else {
-                        // Serwer zwrócił kod błędu (np. 400 lub 409 przy zajętym loginie)
-                        // Tutaj wyciągamy komunikat "Login jest już zajęty" wysłany z PHP
-                        val errorMsg = try {
-                            val jObjError =
-                                org.json.JSONObject(response.errorBody()?.string() ?: "")
-                            jObjError.getString("message")
-                        } catch (e: Exception) {
-                            "Błąd: Login lub Email może być już zajęty"
-                        }
-
-                        Toast.makeText(this@RegisterActivity, errorMsg, Toast.LENGTH_LONG).show()
+                        Toast.makeText(
+                            this@RegisterActivity,
+                            readErrorMessage(response.errorBody()?.string()),
+                            Toast.LENGTH_LONG
+                        ).show()
                     }
                 } catch (e: Exception) {
-                    Toast.makeText(
-                        this@RegisterActivity,
-                        "Błąd sieci: ${e.message}",
-                        Toast.LENGTH_LONG
-                    ).show()
+                    Toast.makeText(this@RegisterActivity, NetworkUtils.friendlyMessage(e), Toast.LENGTH_LONG).show()
+                } finally {
+                    btnRegister.isEnabled = true
+                    progressRegister.visibility = View.GONE
                 }
-            }
-
-            tvBackToLogin.setOnClickListener {
-                Log.d("SKLEP_DEBUG", "Powrót do logowania")
-                finish()
             }
         }
     }
+
+    private fun readErrorMessage(rawError: String?): String {
+        if (rawError.isNullOrBlank()) {
+            return "Nie udało się utworzyć konta."
+        }
+
+        return try {
+            JSONObject(rawError).optString("message", "Nie udało się utworzyć konta.")
+        } catch (e: Exception) {
+            "Nie udało się utworzyć konta."
+        }
     }
+}

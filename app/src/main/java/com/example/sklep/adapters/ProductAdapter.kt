@@ -13,14 +13,15 @@ import com.example.sklep.models.Product
 
 class ProductAdapter(
     private var products: List<Product>,
-    private val onAddToCartClicked: (Product) -> Unit // Callback do obsługi koszyka
+    private val onAddToCartClicked: (Product) -> Unit,
+    private val onProductClicked: (Product) -> Unit
 ) : RecyclerView.Adapter<ProductAdapter.ProductViewHolder>() {
 
     class ProductViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         val name: TextView = view.findViewById(R.id.tvProductName)
         val price: TextView = view.findViewById(R.id.tvProductPrice)
         val image: ImageView = view.findViewById(R.id.ivProductImage)
-        val btnAddToCart: Button = view.findViewById(R.id.btnAddToCart) // Twój nowy przycisk
+        val btnAddToCart: Button = view.findViewById(R.id.btnAddToCart)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ProductViewHolder {
@@ -33,16 +34,23 @@ class ProductAdapter(
         val product = products[position]
 
         holder.name.text = product.name
-        holder.price.text = "${product.price} zł"
+        holder.price.text = formatPrice(product.price)
+        holder.itemView.setOnClickListener {
+            onProductClicked(product)
+        }
 
-        // Ładowanie zdjęcia przez Glide
         Glide.with(holder.itemView.context)
             .load(product.image_url)
-            .placeholder(android.R.drawable.ic_menu_gallery) // Obrazek zastępczy
-            .error(android.R.drawable.stat_notify_error)    // Obrazek błędu
+            .placeholder(android.R.drawable.ic_menu_gallery)
+            .error(android.R.drawable.stat_notify_error)
             .into(holder.image)
 
-        // Obsługa kliknięcia "Dodaj do koszyka"
+        holder.btnAddToCart.isEnabled = product.stock > 0
+        holder.btnAddToCart.text = if (product.stock > 0) {
+            "Dodaj do koszyka"
+        } else {
+            "Brak w magazynie"
+        }
         holder.btnAddToCart.setOnClickListener {
             onAddToCartClicked(product)
         }
@@ -50,9 +58,16 @@ class ProductAdapter(
 
     override fun getItemCount() = products.size
 
-    // Metoda do odświeżania listy (np. przy filtrowaniu kategorii)
     fun updateData(newProducts: List<Product>) {
         products = newProducts
         notifyDataSetChanged()
+    }
+
+    private fun formatPrice(price: Double): String {
+        return if (price % 1.0 == 0.0) {
+            "%.0f zł".format(price)
+        } else {
+            "%.2f zł".format(price)
+        }
     }
 }

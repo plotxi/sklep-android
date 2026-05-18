@@ -7,13 +7,12 @@
     android:padding="16dp"
     tools:context=".activities.CartActivity">
 
-    <!-- Nagłówek -->
     <LinearLayout
         android:id="@+id/headerCart"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
         android:gravity="center_vertical"
+        android:orientation="horizontal"
         app:layout_constraintTop_toTopOf="parent">
 
         <ImageButton
@@ -21,19 +20,19 @@
             android:layout_width="48dp"
             android:layout_height="48dp"
             android:background="?attr/selectableItemBackgroundBorderless"
+            android:contentDescription="Wstecz"
             android:src="@android:drawable/ic_menu_revert"
             app:tint="#6750A4" />
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Twój Koszyk"
+            android:layout_marginStart="16dp"
+            android:text="Twój koszyk"
             android:textSize="24sp"
-            android:textStyle="bold"
-            android:layout_marginStart="16dp" />
+            android:textStyle="bold" />
     </LinearLayout>
 
-    <!-- Lista produktów w koszyku -->
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/rvCartItems"
         android:layout_width="0dp"
@@ -43,15 +42,52 @@
         app:layout_constraintBottom_toTopOf="@+id/layoutSummary"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/headerCart" />
+        app:layout_constraintTop_toBottomOf="@id/headerCart"
+        tools:listitem="@layout/item_cart" />
 
-    <!-- Podsumowanie na dole -->
+    <LinearLayout
+        android:id="@+id/emptyCartState"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:orientation="vertical"
+        android:padding="24dp"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/headerCart">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:text="Koszyk jest pusty"
+            android:textSize="22sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:gravity="center"
+            android:text="Dodaj produkty, które chcesz zamówić."
+            android:textSize="16sp" />
+
+        <Button
+            android:id="@+id/btnBrowseProducts"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:text="Przeglądaj produkty" />
+    </LinearLayout>
+
     <LinearLayout
         android:id="@+id/layoutSummary"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
         android:background="#F5F5F5"
+        android:orientation="vertical"
         android:padding="16dp"
         app:layout_constraintBottom_toBottomOf="parent">
 
@@ -59,19 +95,29 @@
             android:id="@+id/tvTotalAmount"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginBottom="16dp"
+            android:gravity="end"
             android:text="Suma: 0.00 zł"
             android:textSize="20sp"
-            android:textStyle="bold"
-            android:gravity="end"
-            android:layout_marginBottom="16dp" />
+            android:textStyle="bold" />
 
         <Button
             android:id="@+id/btnPlaceOrder"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="ZŁÓŻ ZAMÓWIENIE"
             android:backgroundTint="#4CAF50"
-            android:padding="12dp" />
+            android:padding="12dp"
+            android:text="Złóż zamówienie" />
     </LinearLayout>
+
+    <ProgressBar
+        android:id="@+id/progressOrder"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

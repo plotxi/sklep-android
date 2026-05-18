@@ -5,49 +5,73 @@
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:padding="16dp"
+    android:paddingStart="16dp"
+    android:paddingTop="16dp"
+    android:paddingEnd="16dp"
+    android:paddingBottom="8dp"
     tools:context=".activities.MainActivity">
 
-    <!-- Tytuł sklepu - ograniczony szerokością, żeby nie kolidował z ikonami -->
     <TextView
         android:id="@+id/tvStoreTitle"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:text="Nasze Produkty"
+        android:layout_marginEnd="8dp"
+        android:text="Nasze produkty"
         android:textSize="22sp"
         android:textStyle="bold"
-        android:layout_marginEnd="8dp"
-        app:layout_constraintBottom_toBottomOf="@+id/btnLogout"
-        app:layout_constraintEnd_toStartOf="@+id/btnGoToCart"
+        app:layout_constraintBottom_toBottomOf="@+id/headerActions"
+        app:layout_constraintEnd_toStartOf="@+id/headerActions"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/btnLogout" />
+        app:layout_constraintTop_toTopOf="@+id/headerActions" />
 
-    <!-- Przycisk Koszyk jako Ikona -->
-    <ImageButton
-        android:id="@+id/btnGoToCart"
-        android:layout_width="48dp"
-        android:layout_height="48dp"
-        android:layout_marginEnd="8dp"
-        android:background="?attr/selectableItemBackgroundBorderless"
-        android:contentDescription="Koszyk"
-        android:src="@drawable/baseline_shopping_basket_24"
-        app:tint="#6750A4"
-        app:layout_constraintBottom_toBottomOf="@+id/btnLogout"
-        app:layout_constraintEnd_toStartOf="@+id/btnLogout"
-        app:layout_constraintTop_toTopOf="@+id/btnLogout" />
-
-    <!-- Przycisk wyloguj -->
-    <Button
-        android:id="@+id/btnLogout"
+    <LinearLayout
+        android:id="@+id/headerActions"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Wyloguj"
-        android:backgroundTint="#6750A4"
-        android:textColor="@android:color/white"
+        android:layout_height="56dp"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent">
 
-    <!-- Kategorie -->
+        <FrameLayout
+            android:id="@+id/cartButtonContainer"
+            android:layout_width="56dp"
+            android:layout_height="56dp">
+
+            <ImageButton
+                android:id="@+id/btnGoToCart"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:layout_gravity="center"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:contentDescription="Koszyk"
+                android:src="@drawable/baseline_shopping_basket_24"
+                app:tint="#6750A4" />
+
+            <TextView
+                android:id="@+id/tvCartBadge"
+                android:layout_width="22dp"
+                android:layout_height="22dp"
+                android:layout_gravity="top|end"
+                android:background="#B3261E"
+                android:gravity="center"
+                android:minWidth="22dp"
+                android:text="0"
+                android:textColor="@android:color/white"
+                android:textSize="11sp"
+                android:textStyle="bold"
+                android:visibility="gone" />
+        </FrameLayout>
+
+        <Button
+            android:id="@+id/btnLogout"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:backgroundTint="#6750A4"
+            android:text="Wyloguj"
+            android:textColor="@android:color/white" />
+    </LinearLayout>
+
     <HorizontalScrollView
         android:id="@+id/categoryScrollView"
         android:layout_width="0dp"
@@ -56,35 +80,78 @@
         android:scrollbars="none"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/btnLogout">
+        app:layout_constraintTop_toBottomOf="@id/headerActions">
 
         <LinearLayout
+            android:id="@+id/categoryContainer"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
-            android:padding="4dp">
-
-            <Button android:id="@+id/btnAll" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Wszystkie" android:layout_marginEnd="4dp" style="@style/Widget.MaterialComponents.Button.TextButton"/>
-            <Button android:id="@+id/btnSport" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Sport" android:layout_marginEnd="4dp" style="@style/Widget.MaterialComponents.Button.TextButton"/>
-            <Button android:id="@+id/btnElektronika" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Elektronika" android:layout_marginEnd="4dp" style="@style/Widget.MaterialComponents.Button.TextButton"/>
-            <Button android:id="@+id/btnBooks" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Książki" android:layout_marginEnd="4dp" style="@style/Widget.MaterialComponents.Button.TextButton"/>
-            <Button android:id="@+id/btnHome" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Dom" style="@style/Widget.MaterialComponents.Button.TextButton"/>
-
-        </LinearLayout>
+            android:padding="4dp" />
     </HorizontalScrollView>
 
-    <!-- Lista produktów -->
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/rvProducts"
+    <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+        android:id="@+id/swipeProducts"
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:layout_marginTop="8dp"
-        app:layoutManager="androidx.recyclerview.widget.GridLayoutManager"
-        app:spanCount="2"
-        app:layout_constraintBottom_toBottomOf="parent"
+        android:layout_marginBottom="8dp"
+        app:layout_constraintBottom_toTopOf="@+id/bottomNavigation"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/categoryScrollView"
-        tools:listitem="@layout/item_product" />
+        app:layout_constraintTop_toBottomOf="@+id/categoryScrollView">
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/rvProducts"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            app:layoutManager="androidx.recyclerview.widget.GridLayoutManager"
+            app:spanCount="2"
+            tools:listitem="@layout/item_product" />
+    </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
+
+    <Button
+        android:id="@+id/btnRetryProducts"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Spróbuj ponownie"
+        android:visibility="gone"
+        app:layout_constraintBottom_toTopOf="@+id/bottomNavigation"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/categoryScrollView" />
+
+    <LinearLayout
+        android:id="@+id/bottomNavigation"
+        android:layout_width="0dp"
+        android:layout_height="64dp"
+        android:background="#F5F5F5"
+        android:gravity="center"
+        android:orientation="horizontal"
+        android:padding="6dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent">
+
+        <ImageButton
+            android:id="@+id/btnHomeTab"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:contentDescription="Sklep"
+            android:src="@drawable/baseline_home_24"
+            app:tint="#6750A4" />
+
+        <ImageButton
+            android:id="@+id/btnOrdersTab"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:contentDescription="Zamówienia"
+            android:src="@drawable/baseline_local_shipping_24"
+            app:tint="#6750A4" />
+    </LinearLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

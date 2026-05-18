@@ -19,18 +19,18 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_marginBottom="24dp"
                 android:text="Rejestracja"
                 android:textSize="28sp"
-                android:textStyle="bold"
-                android:layout_marginBottom="24dp"/>
+                android:textStyle="bold" />
 
-            <!-- EMAIL -->
             <com.google.android.material.textfield.TextInputLayout
                 style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="Adres Email"
-                android:layout_marginBottom="12dp">
+                android:layout_marginBottom="12dp"
+                android:hint="Adres Email">
+
                 <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/etRegEmail"
                     android:layout_width="match_parent"
@@ -38,13 +38,13 @@
                     android:inputType="textEmailAddress" />
             </com.google.android.material.textfield.TextInputLayout>
 
-            <!-- LOGIN -->
             <com.google.android.material.textfield.TextInputLayout
                 style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="Login użytkownika"
-                android:layout_marginBottom="12dp">
+                android:layout_marginBottom="12dp"
+                android:hint="Login użytkownika">
+
                 <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/etRegLogin"
                     android:layout_width="match_parent"
@@ -52,14 +52,14 @@
                     android:inputType="text" />
             </com.google.android.material.textfield.TextInputLayout>
 
-            <!-- HASŁO -->
             <com.google.android.material.textfield.TextInputLayout
                 style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_marginBottom="12dp"
                 android:hint="Hasło"
-                app:endIconMode="password_toggle"
-                android:layout_marginBottom="12dp">
+                app:endIconMode="password_toggle">
+
                 <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/etRegPassword"
                     android:layout_width="match_parent"
@@ -67,14 +67,14 @@
                     android:inputType="textPassword" />
             </com.google.android.material.textfield.TextInputLayout>
 
-            <!-- POWTÓRZ HASŁO -->
             <com.google.android.material.textfield.TextInputLayout
                 style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_marginBottom="24dp"
                 android:hint="Powtórz hasło"
-                app:endIconMode="password_toggle"
-                android:layout_marginBottom="24dp">
+                app:endIconMode="password_toggle">
+
                 <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/etRegPasswordRepeat"
                     android:layout_width="match_parent"
@@ -88,14 +88,22 @@
                 android:layout_height="60dp"
                 android:text="Zarejestruj się" />
 
+            <ProgressBar
+                android:id="@+id/progressRegister"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:layout_gravity="center"
+                android:layout_marginTop="12dp"
+                android:visibility="gone" />
+
             <TextView
                 android:id="@+id/tvBackToLogin"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
                 android:layout_marginTop="16dp"
-                android:text="Masz już konto? Zaloguj się"
-                android:padding="8dp" />
+                android:padding="8dp"
+                android:text="Masz już konto? Zaloguj się" />
 
         </LinearLayout>
     </ScrollView>
