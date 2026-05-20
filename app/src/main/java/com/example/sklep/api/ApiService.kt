@@ -13,6 +13,8 @@ import retrofit2.http.Query
 
 data class LoginRequest(
     val login: String,
+    val email: String,
+    val username: String,
     val password: String
 )
 

@@ -9,7 +9,7 @@ data class Product(
     val price: Double,
 
     @SerializedName("image_url")
-    val image_url: String,
+    val image_url: String?,
 
     @SerializedName("category_id")
     val category_id: Int,

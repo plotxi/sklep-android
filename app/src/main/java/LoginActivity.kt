@@ -16,6 +16,7 @@ import com.example.sklep.utils.NetworkUtils
 import com.example.sklep.utils.TokenManager
 import com.google.android.material.textfield.TextInputEditText
 import kotlinx.coroutines.launch
+import org.json.JSONObject
 
 class LoginActivity : AppCompatActivity() {
 
@@ -44,12 +45,12 @@ class LoginActivity : AppCompatActivity() {
             val pass = etPassword.text.toString().trim()
 
             if (login.isEmpty() || pass.isEmpty()) {
-                Toast.makeText(this, "Uzupełnij pola.", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this, "Uzupelnij pola.", Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
             }
 
             if (!NetworkUtils.hasInternet(this)) {
-                Toast.makeText(this, "Brak połączenia z internetem.", Toast.LENGTH_LONG).show()
+                Toast.makeText(this, "Brak polaczenia z internetem.", Toast.LENGTH_LONG).show()
                 return@setOnClickListener
             }
 
@@ -59,11 +60,11 @@ class LoginActivity : AppCompatActivity() {
             lifecycleScope.launch {
                 try {
                     val response = RetrofitClient.getService(this@LoginActivity)
-                        .login(LoginRequest(login, pass))
+                        .login(LoginRequest(login = login, email = login, username = login, password = pass))
 
                     if (response.isSuccessful) {
                         val body = response.body()
-                        val tokenValue = body?.data?.token
+                        val tokenValue = body?.data?.token ?: body?.token
 
                         if (body?.success == true && !tokenValue.isNullOrEmpty()) {
                             TokenManager.saveToken(this@LoginActivity, tokenValue)
@@ -72,17 +73,13 @@ class LoginActivity : AppCompatActivity() {
                         } else {
                             Toast.makeText(
                                 this@LoginActivity,
-                                body?.message ?: "Błędne dane logowania.",
+                                body?.message ?: "Bledne dane logowania.",
                                 Toast.LENGTH_SHORT
                             ).show()
                         }
                     } else {
-                        val msg = if (response.code() == 401) {
-                            "Nieprawidłowy login lub hasło."
-                        } else {
-                            "Nie udało się zalogować. Spróbuj ponownie."
-                        }
-                        Toast.makeText(this@LoginActivity, msg, Toast.LENGTH_SHORT).show()
+                        val msg = parseErrorMessage(response.code(), response.errorBody()?.string())
+                        Toast.makeText(this@LoginActivity, msg, Toast.LENGTH_LONG).show()
                     }
                 } catch (e: Exception) {
                     Toast.makeText(this@LoginActivity, NetworkUtils.friendlyMessage(e), Toast.LENGTH_LONG).show()
@@ -91,6 +88,29 @@ class LoginActivity : AppCompatActivity() {
                     progressLogin.visibility = View.GONE
                 }
             }
+        }
+    }
+
+    private fun parseErrorMessage(code: Int, errorBody: String?): String {
+        if (code == 401) {
+            return "Nieprawidlowy login lub haslo."
+        }
+
+        val message = errorBody
+            ?.takeIf { it.isNotBlank() }
+            ?.let { body ->
+                runCatching { JSONObject(body).optString("message") }.getOrNull()
+                    ?.takeIf { it.isNotBlank() }
+            }
+
+        if (!message.isNullOrBlank()) {
+            return message
+        }
+
+        return when (code) {
+            400 -> "Nieprawidlowe dane logowania."
+            500 -> "Blad serwera logowania. Sprawdz pliki API na hostingu."
+            else -> "Nie udalo sie zalogowac. Kod HTTP: $code"
         }
     }
 

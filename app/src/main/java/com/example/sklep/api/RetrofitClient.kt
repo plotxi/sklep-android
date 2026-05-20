@@ -10,7 +10,7 @@ import retrofit2.converter.gson.GsonConverterFactory
 import java.util.concurrent.TimeUnit
 
 object RetrofitClient {
-    private const val BASE_URL = "http://192.168.30.74/sklep/"
+    private const val BASE_URL = "http://praktykitestowy.pablo-art.pl/sklep/"
 
     fun getService(context: Context): ApiService {
         val logging = HttpLoggingInterceptor().apply {
